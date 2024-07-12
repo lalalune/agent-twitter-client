@@ -115,5 +115,5 @@ dist
 # Documentation
 docs/
 
-# NPM lockfile
-package-lock.json
+# Yarn lockfile
+yarn.lock

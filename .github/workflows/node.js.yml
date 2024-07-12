@@ -23,15 +23,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - name: Yarn
-        run: npm install -g yarn
       - name: Install
-        run: yarn install
+        run: npm install
       - name: Test
         env:
           TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
           TWITTER_PASSWORD: ${{ secrets.TWITTER_PASSWORD }}
           TWITTER_EMAIL: ${{ secrets.TWITTER_EMAIL }}
-        run: yarn test
+        run: npm run test
       - name: Build
-        run: yarn build
+        run: npm run build

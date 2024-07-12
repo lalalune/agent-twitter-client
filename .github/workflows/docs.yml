@@ -13,13 +13,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Yarn
-        run: npm install -g yarn
       - name: Install
-        run: yarn install
+        run: npm install
       - name: Deploy docs
         run: |
           git config --global user.name 'venatbot'
           git config --global user.email 'venatbot@protonmail.com'
           git remote set-url origin 'https://venatbot:${{ secrets.GH_TOKEN }}@github.com/the-convocation/twitter-scraper.git'
-          yarn docs:deploy
+          npm run docs:deploy

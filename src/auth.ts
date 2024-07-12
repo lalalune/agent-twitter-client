@@ -1,7 +1,6 @@
 import { Cookie, CookieJar, MemoryCookieStore } from 'tough-cookie';
 import { updateCookieJar } from './requests';
 import { Headers } from 'headers-polyfill';
-import fetch from 'cross-fetch';
 import { FetchTransformOptions } from './api';
 
 export interface TwitterAuthOptions {

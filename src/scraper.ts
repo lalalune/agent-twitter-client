@@ -32,8 +32,8 @@ import {
   fetchListTweets,
   getTweetsAndRepliesByUserId,
   getTweetsAndReplies,
+  createCreateTweetRequest,
 } from './tweets';
-import fetch from 'cross-fetch';
 
 const twUrl = 'https://twitter.com';
 
@@ -272,6 +272,29 @@ export class Scraper {
     maxTweets = 200,
   ): AsyncGenerator<Tweet, void> {
     return getTweetsByUserId(userId, maxTweets, this.auth);
+  }
+
+  /**
+   * Send a tweet
+   * @param text The text of the tweet 
+   * @returns 
+   */
+
+  async sendTweet(text: string) {
+    try {
+      const response = await createCreateTweetRequest(text, this.auth);
+      console.log('**** response');
+      console.log(JSON.stringify(response));
+      if (response.ok) {
+        console.log('Draft tweet created successfully:');
+        return true;
+      } else {
+        console.error('Failed to create draft tweet');
+      }
+    } catch (error) {
+      console.error('Error in sending draft tweet:', error);
+    }
+    return false;
   }
 
   /**

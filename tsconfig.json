@@ -1,6 +1,6 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
-  "exclude": ["node_modules", "dist", "examples", "**/*.test.ts", "src/test-utils.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/test-utils.ts"],
   "compilerOptions": {
     // TODO: Remove "dom" from this when support for Node 16 is dropped
     "lib": ["es2021", "dom"],

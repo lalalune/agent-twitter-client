@@ -320,3 +320,14 @@ test('scraper can get liked tweets', async () => {
   expect(tweet.done).toBeFalsy();
   expect(tweet.value?.id).not.toBeUndefined();
 });
+
+test('sendTweet successfully sends a tweet', async () => {
+  const scraper = await getScraper();
+  const draftText = 'This is a test tweet';
+
+  const success = await scraper.sendTweet(draftText);
+
+  // Verify that an error message was logged
+  // Note: This assumes your implementation of sendTweet logs an error message on failure
+  expect(success).toBe(true);
+});

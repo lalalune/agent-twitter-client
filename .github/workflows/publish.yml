@@ -14,13 +14,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Yarn
-        run: npm install -g yarn
       - name: Install
-        run: yarn install
+        run: npm install
       - name: Build
-        run: yarn build
+        run: npm run build
       - name: Publish
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn publish --access public
+        run: npm publish --access public
