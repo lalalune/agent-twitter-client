@@ -314,7 +314,7 @@ test('scraper can get tweet thread', async () => {
 
 test('sendTweet successfully sends a tweet', async () => {
   const scraper = await getScraper();
-  const draftText = 'This is a test tweet';
+  const draftText = 'Core updated on ' + Date.now().toString();
 
   const success = await scraper.sendTweet(draftText);
 
