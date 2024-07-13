@@ -21,15 +21,10 @@
       "require": "./dist/default/cjs/index.js"
     }
   },
-  "repository": "https://github.com/RubyResearch/agent-twitter-client.git",
   "author": "Ruby Research",
   "license": "MIT",
-  "engines": {
-    "node": ">=16"
-  },
   "scripts": {
     "build": "rimraf dist && rollup -c",
-    "commit": "cz",
     "docs:generate": "typedoc --options typedoc.json",
     "docs:deploy": "npm run docs:generate && gh-pages -d docs",
     "format": "prettier --write src/**/*.ts",
@@ -54,7 +49,6 @@
     "@types/tough-cookie": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "^5.59.7",
-    "cz-conventional-changelog": "^3.3.0",
     "dotenv": "^16.3.1",
     "esbuild": "^0.21.5",
     "eslint": "^8.41.0",
@@ -72,11 +66,6 @@
     "ts-jest": "^29.1.0",
     "typedoc": "^0.24.7",
     "typescript": "^5.0.4"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "lint-staged": {
     "*.{js,ts}": [
