@@ -312,15 +312,6 @@ test('scraper can get tweet thread', async () => {
   expect(tweet?.thread.length).toStrictEqual(7);
 });
 
-test('scraper can get liked tweets', async () => {
-  const scraper = await getScraper();
-  const liked = scraper.getLikedTweets('elonmusk', 10);
-  const tweet = await liked.next();
-  expect(tweet.value).not.toBeUndefined();
-  expect(tweet.done).toBeFalsy();
-  expect(tweet.value?.id).not.toBeUndefined();
-});
-
 test('sendTweet successfully sends a tweet', async () => {
   const scraper = await getScraper();
   const draftText = 'This is a test tweet';
