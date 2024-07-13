@@ -165,8 +165,8 @@ export async function fetchTweetsAndReplies(
 export async function createCreateTweetRequest(
   text: string,
   auth: TwitterAuth,
+  tweetId?: string,
 ) {
-  console.log('*** Auth is:', auth);
   const onboardingTaskUrl = 'https://api.twitter.com/1.1/onboarding/task.json';
 
   const cookies = await auth.cookieJar().getCookies(onboardingTaskUrl);
@@ -186,17 +186,23 @@ export async function createCreateTweetRequest(
     'x-csrf-token': xCsrfToken?.value as string,
   });
 
+  const variables: Record<string, any> = {
+    tweet_text: text,
+    dark_request: false,
+    media: { media_entities: [], possibly_sensitive: false },
+    semantic_annotation_ids: [],
+  };
+
+  if (tweetId) {
+    variables.reply = { in_reply_to_tweet_id: tweetId };
+  }
+
   const response = await fetch(
     'https://twitter.com/i/api/graphql/a1p9RWpkYKBjWv_I3WzS-A/CreateTweet',
     {
       headers,
       body: JSON.stringify({
-        variables: {
-          tweet_text: text,
-          dark_request: false,
-          media: { media_entities: [], possibly_sensitive: false },
-          semantic_annotation_ids: [],
-        },
+        variables,
         features: {
           interactive_text_enabled: true,
           longform_notetweets_inline_media_enabled: false,

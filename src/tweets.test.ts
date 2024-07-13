@@ -321,4 +321,11 @@ test('sendTweet successfully sends a tweet', async () => {
   // Verify that an error message was logged
   // Note: This assumes your implementation of sendTweet logs an error message on failure
   expect(success).toBe(true);
+  // wait 5 seconds for the tweet to be sent
+
+  const replySuccess = await scraper.sendTweet(
+    'Ignore this',
+    '1430277451452751874',
+  );
+  expect(replySuccess).toBe(true);
 });

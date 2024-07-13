@@ -269,10 +269,9 @@ export class Scraper {
    * @returns 
    */
 
-  async sendTweet(text: string) {
+  async sendTweet(text: string, tweetId?: string) {
     try {
-      const response = await createCreateTweetRequest(text, this.auth);
-      console.log('**** response');
+      const response = await createCreateTweetRequest(text, this.auth, tweetId);
       console.log(JSON.stringify(response));
       if (response.ok) {
         console.log('Draft tweet created successfully:');
