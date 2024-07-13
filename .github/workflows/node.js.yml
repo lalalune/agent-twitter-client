@@ -6,17 +6,13 @@ name: Node.js CI
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: '37 22 * * 2'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [18.x, 20.x]
+        node: [20.x]
     steps:
       - uses: actions/checkout@v3
       - name: Install Node.js ${{ matrix.node }}
