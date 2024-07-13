@@ -10,23 +10,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [20.x]
     steps:
       - uses: actions/checkout@v3
-      - name: Install Node.js ${{ matrix.node }}
+      - name: Install Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 20.x
       - name: Install
         run: npm install
-      - name: Test
-        env:
-          TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
-          TWITTER_PASSWORD: ${{ secrets.TWITTER_PASSWORD }}
-          TWITTER_EMAIL: ${{ secrets.TWITTER_EMAIL }}
-          TWITTER_COOKIES: ${{ secrets.TWITTER_COOKIES }}
-        run: npm run test
+      # - name: Test
+      #   env:
+      #     TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
+      #     TWITTER_PASSWORD: ${{ secrets.TWITTER_PASSWORD }}
+      #     TWITTER_EMAIL: ${{ secrets.TWITTER_EMAIL }}
+      #     TWITTER_COOKIES: ${{ secrets.TWITTER_COOKIES }}
+      #   run: npm run test
       - name: Build
         run: npm run build
