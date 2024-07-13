@@ -374,24 +374,6 @@ export async function fetchLikedTweets(
   return parseTimelineTweetsV2(res.value);
 }
 
-export function getLikedTweets(
-  user: string,
-  maxTweets: number,
-  auth: TwitterAuth,
-): AsyncGenerator<Tweet, void> {
-  return getTweetTimeline(user, maxTweets, async (q, mt, c) => {
-    const userIdRes = await getUserIdByScreenName(q, auth);
-
-    if (!userIdRes.success) {
-      throw userIdRes.err;
-    }
-
-    const { value: userId } = userIdRes;
-
-    return fetchLikedTweets(userId, mt, c, auth);
-  });
-}
-
 export async function getTweetWhere(
   tweets: AsyncIterable<Tweet>,
   query: TweetQuery,
