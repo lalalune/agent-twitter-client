@@ -203,6 +203,78 @@ export async function getProfile(
 
 const idCache = new Map<string, string>();
 
+export async function getScreenNameByUserId(
+  userId: string,
+  auth: TwitterAuth,
+): Promise<RequestApiResult<string>> {
+  const params = new URLSearchParams();
+  params.set(
+    'variables',
+    stringify({
+      userId: userId,
+      withSafetyModeUserFields: true,
+    }),
+  );
+
+  params.set(
+    'features',
+    stringify({
+      hidden_profile_subscriptions_enabled: true,
+      rweb_tipjar_consumption_enabled: true,
+      responsive_web_graphql_exclude_directive_enabled: true,
+      verified_phone_label_enabled: false,
+      highlights_tweets_tab_ui_enabled: true,
+      responsive_web_twitter_article_notes_tab_enabled: true,
+      subscriptions_feature_can_gift_premium: false,
+      creator_subscriptions_tweet_preview_api_enabled: true,
+      responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
+      responsive_web_graphql_timeline_navigation_enabled: true,
+    }),
+  );
+
+  const res = await requestApi<UserRaw>(
+    `https://twitter.com/i/api/graphql/xf3jd90KKBCUxdlI_tNHZw/UserByRestId?${params.toString()}`,
+    auth,
+  );
+
+  if (!res.success) {
+    return res;
+  }
+
+  const { value } = res;
+  const { errors } = value;
+  if (errors != null && errors.length > 0) {
+    return {
+      success: false,
+      err: new Error(errors[0].message),
+    };
+  }
+
+  if (!value.data || !value.data.user || !value.data.user.result) {
+    return {
+      success: false,
+      err: new Error('User not found.'),
+    };
+  }
+
+  const { result: user } = value.data.user;
+  const { legacy } = user;
+
+  if (legacy.screen_name == null || legacy.screen_name.length === 0) {
+    return {
+      success: false,
+      err: new Error(
+        `Either user with ID ${userId} does not exist or is private.`,
+      ),
+    };
+  }
+
+  return {
+    success: true,
+    value: legacy.screen_name,
+  };
+}
+
 export async function getUserIdByScreenName(
   screenName: string,
   auth: TwitterAuth,

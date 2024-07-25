@@ -1,6 +1,12 @@
 import { Profile } from './profile';
 import { getScraper } from './test-utils';
 
+test('scraper can get screen name by user id', async () => {
+  const scraper = await getScraper();
+  const screenName = await scraper.getScreenNameByUserId('1586562503865008129');
+  expect(screenName).toEqual('ligma__sigma');
+});
+
 test('scraper can get profile', async () => {
   const expected: Profile = {
     avatar:

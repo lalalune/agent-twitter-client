@@ -2,7 +2,12 @@ import { Cookie } from 'tough-cookie';
 import { bearerToken, FetchTransformOptions, RequestApiResult } from './api';
 import { TwitterAuth, TwitterAuthOptions, TwitterGuestAuth } from './auth';
 import { TwitterUserAuth } from './auth-user';
-import { getProfile, getUserIdByScreenName, Profile } from './profile';
+import {
+  getProfile,
+  getUserIdByScreenName,
+  getScreenNameByUserId,
+  Profile,
+} from './profile';
 import {
   fetchSearchProfiles,
   fetchSearchTweets,
@@ -97,6 +102,16 @@ export class Scraper {
   public async getUserIdByScreenName(screenName: string): Promise<string> {
     const res = await getUserIdByScreenName(screenName, this.auth);
     return this.handleResponse(res);
+  }
+
+  /**
+   *
+   * @param userId The user ID of the profile to fetch.
+   * @returns The screen name of the corresponding account.
+   */
+  public async getScreenNameByUserId(userId: string): Promise<string> {
+    const response = await getScreenNameByUserId(userId, this.auth);
+    return this.handleResponse(response);
   }
 
   /**
@@ -265,8 +280,8 @@ export class Scraper {
 
   /**
    * Send a tweet
-   * @param text The text of the tweet 
-   * @returns 
+   * @param text The text of the tweet
+   * @returns
    */
 
   async sendTweet(text: string, tweetId?: string) {
