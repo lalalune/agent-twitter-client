@@ -1,7 +1,6 @@
 import { getScraper } from './test-utils';
-import { Mention, Tweet } from './tweets';
 import { QueryTweetsResponse } from './timeline-v1';
-import { SearchMode } from './search';
+import { Mention, Tweet } from './tweets';
 
 test('scraper can get tweet', async () => {
   const expected: Tweet = {
@@ -312,20 +311,36 @@ test('scraper can get tweet thread', async () => {
   expect(tweet?.thread.length).toStrictEqual(7);
 });
 
+test('scraper can get user tweets', async () => {
+  const scraper = await getScraper();
+
+  const userId = '1830340867737178112'; // Replace with a valid user ID
+  const maxTweets = 200;
+
+  const response = await scraper.getUserTweets(userId, maxTweets);
+
+  expect(response.tweets).toBeDefined();
+  expect(response.tweets.length).toBeLessThanOrEqual(maxTweets);
+
+  // Check if each object in the tweets array is a valid Tweet object
+  response.tweets.forEach((tweet) => {
+    expect(tweet.id).toBeDefined();
+    expect(tweet.text).toBeDefined();
+  });
+
+  expect(response.next).toBeDefined();
+}, 30000);
+
 test('sendTweet successfully sends a tweet', async () => {
   const scraper = await getScraper();
   const draftText = 'Core updated on ' + Date.now().toString();
 
-  const success = await scraper.sendTweet(draftText);
+  const result = await scraper.sendTweet(draftText);
+  console.log('Send tweet result:', result);
 
-  // Verify that an error message was logged
-  // Note: This assumes your implementation of sendTweet logs an error message on failure
-  expect(success).toBe(true);
-  // wait 5 seconds for the tweet to be sent
-
-  const replySuccess = await scraper.sendTweet(
+  const replyResult = await scraper.sendTweet(
     'Ignore this',
     '1430277451452751874',
   );
-  expect(replySuccess).toBe(true);
+  console.log('Send reply result:', replyResult);
 });

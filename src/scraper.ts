@@ -1,5 +1,10 @@
 import { Cookie } from 'tough-cookie';
-import { bearerToken, FetchTransformOptions, RequestApiResult } from './api';
+import {
+  bearerToken,
+  FetchTransformOptions,
+  requestApi,
+  RequestApiResult,
+} from './api';
 import { TwitterAuth, TwitterAuthOptions, TwitterGuestAuth } from './auth';
 import { TwitterUserAuth } from './auth-user';
 import {
@@ -38,8 +43,11 @@ import {
   getTweetsAndReplies,
   createCreateTweetRequest,
 } from './tweets';
+import { parseTimelineTweetsV2, TimelineV2 } from './timeline-v2';
 
 const twUrl = 'https://twitter.com';
+const UserTweetsUrl =
+  'https://twitter.com/i/api/graphql/E3opETHurmVJflFsUBVuUQ/UserTweets';
 
 export interface ScraperOptions {
   /**
@@ -247,6 +255,109 @@ export class Scraper {
     return fetchProfileFollowers(userId, maxProfiles, this.auth, cursor);
   }
 
+  async getUserTweets(
+    userId: string,
+    maxTweets = 200,
+    cursor?: string,
+  ): Promise<{ tweets: Tweet[]; next?: string }> {
+    if (maxTweets > 200) {
+      maxTweets = 200;
+    }
+
+    const variables: Record<string, any> = {
+      userId,
+      count: maxTweets,
+      includePromotedContent: true,
+      withQuickPromoteEligibilityTweetFields: true,
+      withVoice: true,
+      withV2Timeline: true,
+    };
+
+    if (cursor) {
+      variables['cursor'] = cursor;
+    }
+
+    const features = {
+      rweb_tipjar_consumption_enabled: true,
+      responsive_web_graphql_exclude_directive_enabled: true,
+      verified_phone_label_enabled: false,
+      creator_subscriptions_tweet_preview_api_enabled: true,
+      responsive_web_graphql_timeline_navigation_enabled: true,
+      responsive_web_graphql_skip_user_profile_image_extensions_enabled: false,
+      communities_web_enable_tweet_community_results_fetch: true,
+      c9s_tweet_anatomy_moderator_badge_enabled: true,
+      articles_preview_enabled: true,
+      responsive_web_edit_tweet_api_enabled: true,
+      graphql_is_translatable_rweb_tweet_is_translatable_enabled: true,
+      view_counts_everywhere_api_enabled: true,
+      longform_notetweets_consumption_enabled: true,
+      responsive_web_twitter_article_tweet_consumption_enabled: true,
+      tweet_awards_web_tipping_enabled: false,
+      creator_subscriptions_quote_tweet_preview_enabled: false,
+      freedom_of_speech_not_reach_fetch_enabled: true,
+      standardized_nudges_misinfo: true,
+      tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled:
+        true,
+      rweb_video_timestamps_enabled: true,
+      longform_notetweets_rich_text_read_enabled: true,
+      longform_notetweets_inline_media_enabled: true,
+      responsive_web_enhance_cards_enabled: false,
+    };
+
+    const fieldToggles = {
+      withArticlePlainText: false,
+    };
+
+    const res = await requestApi<TimelineV2>(
+      `${UserTweetsUrl}?variables=${encodeURIComponent(
+        JSON.stringify(variables),
+      )}&features=${encodeURIComponent(
+        JSON.stringify(features),
+      )}&fieldToggles=${encodeURIComponent(JSON.stringify(fieldToggles))}`,
+      this.auth,
+    );
+
+    if (!res.success) {
+      throw res.err;
+    }
+
+    const timelineV2 = parseTimelineTweetsV2(res.value);
+    return {
+      tweets: timelineV2.tweets,
+      next: timelineV2.next,
+    };
+  }
+
+  async *getUserTweetsIterator(
+    userId: string,
+    maxTweets = 200,
+  ): AsyncGenerator<Tweet, void> {
+    let cursor: string | undefined;
+    let retrievedTweets = 0;
+
+    while (retrievedTweets < maxTweets) {
+      const response = await this.getUserTweets(
+        userId,
+        maxTweets - retrievedTweets,
+        cursor,
+      );
+
+      for (const tweet of response.tweets) {
+        yield tweet;
+        retrievedTweets++;
+        if (retrievedTweets >= maxTweets) {
+          break;
+        }
+      }
+
+      cursor = response.next;
+
+      if (!cursor) {
+        break;
+      }
+    }
+  }
+
   /**
    * Fetches the current trends from Twitter.
    * @returns The current list of trends.
@@ -281,23 +392,12 @@ export class Scraper {
   /**
    * Send a tweet
    * @param text The text of the tweet
+   * @param tweetId The id of the tweet to reply to
    * @returns
    */
 
-  async sendTweet(text: string, tweetId?: string) {
-    try {
-      const response = await createCreateTweetRequest(text, this.auth, tweetId);
-      console.log(JSON.stringify(response));
-      if (response.ok) {
-        console.log('Draft tweet created successfully:');
-        return true;
-      } else {
-        console.error('Failed to create draft tweet');
-      }
-    } catch (error) {
-      console.error('Error in sending draft tweet:', error);
-    }
-    return false;
+  async sendTweet(text: string, replyToTweetId?: string) {
+    return await createCreateTweetRequest(text, this.auth, replyToTweetId);
   }
 
   /**
@@ -467,8 +567,16 @@ export class Scraper {
    */
   public async setCookies(cookies: (string | Cookie)[]): Promise<void> {
     const userAuth = new TwitterUserAuth(this.token, this.getAuthOptions());
-    for (const cookie of cookies) {
-      await userAuth.cookieJar().setCookie(cookie, twUrl);
+    const cookiesData = cookies.map((cookieData) =>
+      Cookie.fromJSON(JSON.stringify(cookieData)),
+    );
+
+    for (const cookie of cookiesData) {
+      if (cookie !== null) {
+        await userAuth.cookieJar().setCookie(cookie, twUrl);
+      } else {
+        console.error('Invalid cookie:', cookie);
+      }
     }
 
     this.auth = userAuth;
