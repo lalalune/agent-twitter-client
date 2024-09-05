@@ -567,16 +567,8 @@ export class Scraper {
    */
   public async setCookies(cookies: (string | Cookie)[]): Promise<void> {
     const userAuth = new TwitterUserAuth(this.token, this.getAuthOptions());
-    const cookiesData = cookies.map((cookieData) =>
-      Cookie.fromJSON(JSON.stringify(cookieData)),
-    );
-
-    for (const cookie of cookiesData) {
-      if (cookie !== null) {
-        await userAuth.cookieJar().setCookie(cookie, twUrl);
-      } else {
-        console.error('Invalid cookie:', cookie);
-      }
+    for (const cookie of cookies) {
+      await userAuth.cookieJar().setCookie(cookie, twUrl);
     }
 
     this.auth = userAuth;
