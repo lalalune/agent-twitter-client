@@ -14,7 +14,6 @@ Configure environment variables for authentication.
 TWITTER_USERNAME=    # Account username
 TWITTER_PASSWORD=    # Account password
 TWITTER_EMAIL=       # Account email
-TWITTER_COOKIES=     # JSON-serialized array of cookies of an authenticated session
 PROXY_URL=           # HTTP(s) proxy for requests (necessary for browsers)
 ```
 

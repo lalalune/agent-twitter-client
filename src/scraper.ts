@@ -44,6 +44,7 @@ import {
   createCreateTweetRequest,
 } from './tweets';
 import { parseTimelineTweetsV2, TimelineV2 } from './timeline-v2';
+import { fetchHomeTimeline, HomeTimelineResponse } from './timeline-home';
 
 const twUrl = 'https://twitter.com';
 const UserTweetsUrl =
@@ -253,6 +254,19 @@ export class Scraper {
     cursor?: string,
   ): Promise<QueryProfilesResponse> {
     return fetchProfileFollowers(userId, maxProfiles, this.auth, cursor);
+  }
+
+  /**
+   * Fetches the home timeline for the current user.
+   * @param count The number of tweets to fetch.
+   * @param seenTweetIds An array of tweet IDs that have already been seen.
+   * @returns A promise that resolves to the home timeline response.
+   */
+  public async fetchHomeTimeline(
+    count: number,
+    seenTweetIds: string[],
+  ): Promise<any[]> {
+    return await fetchHomeTimeline(count, seenTweetIds, this.auth);
   }
 
   async getUserTweets(

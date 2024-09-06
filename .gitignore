@@ -117,3 +117,5 @@ docs/
 
 # Yarn lockfile
 yarn.lock
+
+cookies.json

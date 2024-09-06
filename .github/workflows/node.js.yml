@@ -23,7 +23,6 @@ jobs:
       #     TWITTER_USERNAME: ${{ secrets.TWITTER_USERNAME }}
       #     TWITTER_PASSWORD: ${{ secrets.TWITTER_PASSWORD }}
       #     TWITTER_EMAIL: ${{ secrets.TWITTER_EMAIL }}
-      #     TWITTER_COOKIES: ${{ secrets.TWITTER_COOKIES }}
       #   run: npm run test
       - name: Build
         run: npm run build
